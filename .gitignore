@@ -1,0 +1,12 @@
+# ビルド生成物
+app/build/
+*.apk
+*.idsig
+tools/res/
+
+# 開発中の検証スクショ（READMEに使うものだけ docs/ に置く）
+shots/
+
+# エディタ等
+.DS_Store
+*.swp
