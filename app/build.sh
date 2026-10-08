@@ -14,6 +14,9 @@ VERSION="$(grep -oE 'android:versionName="[^"]+"' "$APP/AndroidManifest.xml" | h
 VCODE="$(grep -oE 'android:versionCode="[^"]+"' "$APP/AndroidManifest.xml" | head -1 | sed -E 's/.*="([^"]+)"/\1/')"
 APKNAME="ChinsukoMaker-${VERSION}.apk"
 echo "version: ${VERSION} (code ${VCODE}) -> ${APKNAME}"
+# スプラッシュに書いた版が Manifest とずれていないか（二重管理の検出）
+grep -q "<div class=\"sp-ver\">v${VERSION}</div>" "$APP/../web/index.html" \
+  || echo "WARN: web/index.html のスプラッシュ版（.sp-ver）が v${VERSION} と不一致"
 
 export JAVA_HOME="$JDK"
 export PATH="$JDK/bin:$PATH"
