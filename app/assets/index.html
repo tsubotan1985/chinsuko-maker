@@ -179,12 +179,39 @@ body{
 #banner .b1{display:inline-block;font-size:2.3rem;font-weight:900;color:#fff;padding:.5rem 1.4rem;border-radius:.8rem;
   background:linear-gradient(90deg,#ff004d,#ff8a00,#ffe600,#25ff64,#00e5ff,#c400ff);
   box-shadow:0 0 1.6rem rgba(255,255,255,.8);-webkit-text-stroke:.16rem #22000f;paint-order:stroke fill}
+/* ================= v1.2: コイン・ランク・連チャン・ゲームオーバー ================= */
+#rankBadge{display:block;width:max-content;margin:-.2rem auto 0;font-size:1.45rem;font-weight:900;letter-spacing:0;
+  padding:.3rem 1rem;border-radius:2rem;background:rgba(0,0,0,.5);border:.14rem solid rgba(255,255,255,.4);
+  color:#ffe87a;text-shadow:0 0 .6rem rgba(255,215,0,.7)}
+#combo{font-size:2.2rem;font-weight:900;color:#fff;display:none;letter-spacing:.06em;
+  -webkit-text-stroke:.22rem #7a0030;paint-order:stroke fill;text-shadow:0 0 1.1rem #ff2ea6}
+#combo.on{display:block;animation:reachZoom .3s ease-out infinite alternate}
+.stat.coin.low b{color:#ff9090;animation:coinBlink .45s steps(1,end) infinite}
+@keyframes coinBlink{0%,49%{opacity:1}50%,100%{opacity:.32}}
+#over{position:absolute;inset:0;z-index:20;display:none;align-items:center;justify-content:center;
+  background:rgba(8,2,20,.88);padding:2rem}
+#over.on{display:flex;animation:fadeIn .25s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.ovbox{width:100%;max-width:33rem;background:linear-gradient(180deg,#33124d,#150626);border:.3rem solid #ffd700;
+  border-radius:1.8rem;padding:2.2rem 1.7rem;text-align:center;box-shadow:0 0 3.4rem #ff2ea6}
+.ov1{font-size:3.2rem;font-weight:900;color:#fff;-webkit-text-stroke:.26rem #ff004d;paint-order:stroke fill;
+  text-shadow:0 0 1.4rem #ff2ea6}
+.ov2{font-size:1.85rem;font-weight:900;margin-top:.7rem;color:#ffd9d9}
+.ovrec{margin:1.5rem 0;font-size:1.55rem;font-weight:900;line-height:1.75;color:#fff;background:rgba(0,0,0,.35);
+  border-radius:1rem;padding:1rem .8rem}
+.ovrec .k{color:#ffe600}
+#again{width:100%;height:7.6rem;border:0;border-radius:1.3rem;font-family:inherit;font-size:2.6rem;font-weight:900;
+  letter-spacing:.06em;color:#2a0016;background:linear-gradient(180deg,#ffe680,#ffc107 45%,#ff7a00);
+  box-shadow:0 .5rem 0 #7a3b00,0 .9rem 1.4rem rgba(0,0,0,.6),inset 0 .26rem 0 rgba(255,255,255,.6)}
+#again:active{transform:translateY(.4rem);box-shadow:0 .12rem 0 #7a3b00}
+.ov3{margin-top:.9rem;font-size:1.35rem;font-weight:900;opacity:.85}
 </style>
 </head>
 <body>
 <div id="app">
   <header id="topbar">
     <div class="logo">ちんすこうメーカー</div>
+    <div id="rankBadge"><span id="rankIcon">🥚</span> <span id="rankName">みならい</span></div>
     <div class="stats">
       <div class="stat"><b id="sMade">0</b><small>つくった</small></div>
       <div class="stat risk"><b id="sRisk">0</b><small>ヤバさ</small></div>
@@ -210,6 +237,7 @@ body{
 
   <div id="stage">
     <div id="reach">リ ー チ</div>
+    <div id="combo"></div>
     <div id="msg">↕ フリックで まわす！ <span class="hl">ち・ん・す・こ・う</span> を そろえろ</div>
   </div>
 
@@ -217,6 +245,16 @@ body{
     <button id="lever">ま わ せ<span class="sub">フリックでもOK</span></button>
   </div>
   <button id="mute">🔊</button>
+
+  <div id="over">
+    <div class="ovbox">
+      <div class="ov1">ゲームオーバー</div>
+      <div class="ov2">コインが なくなっちゃった…</div>
+      <div class="ovrec" id="ovRec"></div>
+      <button id="again">もういっかい あそぶ</button>
+      <div class="ov3"></div>
+    </div>
+  </div>
 </div>
 
 <canvas id="fx"></canvas>
@@ -284,6 +322,28 @@ const WORDS=[                // 5文字（ち・ん・す・こ・う）で作�
 ];
 const WORDS_S=[...WORDS].sort((a,b)=>b.w.length-a.w.length);
 const RISKY_W=WORDS.filter(x=>x.kind==='risky');
+
+/* ---------------- v1.2: コイン経済・ランク・マイルストーン（低学年向けのやさしい設定） ----------------
+   コイン＝「あと何回まわせるか」の資源。0になるとゲームオーバーだが、
+   つくった数／ヤバさ／ランク／たっせい は保存されて消えない（やさしい）。 */
+const COST=5;                                  // 1回転でへるコイン
+const START_COIN=200;                          // はじめ／ゲームオーバー後にもらえるコイン
+const PAY={chinsuko:10, five:5, four:2, three:1, near:0};    // 当たりでもらえるコイン
+const RANKS=[                                  // つくった数（ぜんぶで）でランクアップ
+  {n:0,      icon:'🥚', name:'みならい'},
+  {n:3000,   icon:'🍪', name:'せんぱい'},
+  {n:10000,  icon:'🏅', name:'しょくにん'},
+  {n:30000,  icon:'🎖️', name:'めいじん'},
+  {n:100000, icon:'👑', name:'たつじん'},
+  {n:300000, icon:'🌈', name:'でんせつ'},
+];
+const MADE_STEPS=[1000,5000,20000,50000,150000,500000];    // 「たっせい」演出（一度きり）
+const RISK_STEPS=[100,300,1000,3000,10000];
+const BEST_KEY='chinsuko.save';
+let save={made:0, risk:0, bestCombo:0, bestCoin:0, plays:0};   // localStorage に残る（ゲームオーバーでも消えない）
+try{ const _b=JSON.parse(localStorage.getItem(BEST_KEY)||'{}');
+     for(const k in save) if(typeof _b[k]==='number') save[k]=_b[k]; }catch(e){}
+function saveNow(){ try{ localStorage.setItem(BEST_KEY,JSON.stringify(save)); }catch(e){} }
 function pickRisky(){
   const tot=RISKY_W.reduce((a,x)=>a+x.wt,0);
   let r=Math.random()*tot;
@@ -305,7 +365,8 @@ const reelsEl=$('#reels'), bigsvg=$('#bigsvg'), bt1=$('#bt1');
 /* ---------------- 状態 ---------------- */
 let reels=[];
 let spinning=false;
-let state={made:0,risk:0,coin:100};
+let state={made:save.made,risk:save.risk,coin:START_COIN,combo:0};   // made/risk は「ぜんぶで」（保存される）
+let prevMade=0, prevRisk=0, lastWin=false, curRank='みならい', overShown=false;
 let outcome=null;
 let stoppedCount=0;
 let reachOn=false, drumTimer=null;
@@ -422,6 +483,8 @@ function clearBig(){
 /* ---------------- 回転 ---------------- */
 function startSpin(dir){
   if(spinning) return;
+  if(state.coin<COST){ showGameOver(); return; }    // コインが足りない＝ゲームオーバー
+  addCoin(-COST);
   clearBig();
   spinning=true; stoppedCount=0; reachOn=false;
   $('#reach').classList.remove('on');
@@ -480,6 +543,7 @@ function finishSpin(){
   drumroll(false);
   if(reachOn){ $('#reach').classList.remove('on'); reachOn=false; }
   judge();
+  postSpin();
 }
 
 /* ---------------- 判定（揃った言葉を探す） ---------------- */
@@ -489,7 +553,8 @@ function charAt(r,row){ return r.cells[cellIndex(r,row)].dataset.ch; }
 function rowChars(row){ return reels.map(r=>charAt(r,row)); }
 
 function judge(){
-  let best=null;
+  prevMade=state.made; prevRisk=state.risk;          // マイルストーン判定用に前の値を控える
+  let best_=null;
   for(let row=0;row<3;row++){
     const chars=rowChars(row);
     for(let s=0;s<5;s++){
@@ -498,13 +563,14 @@ function judge(){
         if(s+L>5) continue;
         if(chars.slice(s,s+L).join('')!==W.w) continue;
         const score=(W.kind==='happy'?100:0)+L*4+(row===1?2:0);
-        if(!best||score>best.score) best={word:W.w,kind:W.kind,len:L,start:s,row:row,score:score};
+        if(!best_||score>best_.score) best_={word:W.w,kind:W.kind,len:L,start:s,row:row,score:score};
       }
     }
   }
-  if(!best){ nearMiss(); return; }
-  showLine(best);
-  if(best.kind==='happy') happyHit(best); else riskyHit(best);
+  lastWin=!!best_;
+  if(!best_){ nearMiss(); return; }
+  showLine(best_);
+  if(best_.kind==='happy') happyHit(best_); else riskyHit(best_);
 }
 
 /* 揃わなかったとき：惜しい演出 */
@@ -521,7 +587,7 @@ function nearMiss(){
     }
   }
   if(n0>=2){
-    if(n0>=3){ state.coin+=30; animCount($('#sCoin'),state.coin); }
+    if(n0>=3){ addCoin(PAY.near); }
     showLine({row:row0,start:s0,len:n0,kind:'normal'},true);
     msg('<span class="hlr">おしい！！</span>「'+w0.slice(0,n0)+'」…あと'+(w0.length-n0)+'もじ', '');
     audio.small();
@@ -550,41 +616,43 @@ function showLine(h,tmp){
 /* ---------------- 演出：ちんすこう ---------------- */
 function happyHit(h){
   const gain=1000;
-  state.made+=gain; state.coin+=100;
+  state.made+=gain;
   animCount($('#sMade'),state.made);
-  animCount($('#sCoin'),state.coin);
+  addCoin(PAY.chinsuko);
   showBig('ちんすこう\nかんせい！！', 'rb', {strobe:true});
   flash('rb');
   confetti(180,'rainbow');
-  banner('ちんすこう かんせい +1000');
+  banner('ちんすこう かんせい +1000 ／ コイン +'+PAY.chinsuko);
   $('#app').classList.add('shake');
   setTimeout(()=>$('#app').classList.remove('shake'),900);
   audio.fanfare(1);
   navigator.vibrate && navigator.vibrate([40,60,40,60,120,80,220]);
-  msg('<span class="hl">ち・ん・す・こ・う</span> が そろった！ちんすこう +1000', '');
+  msg('<span class="hl">ち・ん・す・こ・う</span> が そろった！+1000 ／ コイン +'+PAY.chinsuko, '');
 }
 
 /* ---------------- 演出：ヤバい ---------------- */
 function riskyHit(h){
   const five=h.len>=5;
+  const pay=five?PAY.five:(h.len===4?PAY.four:PAY.three);
   state.risk += five?100:h.len*10;
   riskPeek();
+  addCoin(pay);
   if(five){
     showBig('ちょうヤバい\n!!!!!','au',{strobe:true});
     flash('gold'); setTimeout(()=>flash('gold'),420);
     confetti(220,'gold');
-    banner('ヤバさ +100 ／ ちんすこうメーカー こわれた');
+    banner('ヤバさ +100 ／ コイン +'+pay+' ／ ちんすこうメーカー こわれた');
     audio.siren(1);
     navigator.vibrate && navigator.vibrate([100,50,100,50,100,50,400]);
-    msg('<span class="hlr">ちょうヤバい！！</span> '+h.word.split('').join('・')+' …おつかれさまでした','');
+    msg('<span class="hlr">ちょうヤバい！！</span> '+h.word.split('').join('・')+' …コイン +'+pay,'');
   }else{
     showBig('ヤバい！！','au',{strobe:true});
     flash('gold');
     confetti(90,'gold');
-    banner('ヤバさ +'+(h.len*10)+' …これはヤバい');
+    banner('ヤバさ +'+(h.len*10)+' ／ コイン +'+pay);
     audio.siren(0);
     navigator.vibrate && navigator.vibrate([80,40,80,40,200]);
-    msg('<span class="hlr">ヤバい！</span> '+h.word.split('').join('・')+' が そろった…','');
+    msg('<span class="hlr">ヤバい！</span> '+h.word.split('').join('・')+' が そろった… コイン +'+pay,'');
   }
   $('#app').classList.add('shake','riskyGlow');
   setTimeout(()=>$('#app').classList.remove('shake','riskyGlow'),1400);
@@ -621,6 +689,86 @@ function banner(t){
   const b=$('#banner'); $('#bannerTxt').textContent=t;
   b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
   setTimeout(()=>b.classList.remove('on'),2600);
+}
+
+/* ---------------- v1.2: コイン表示・ランク・連チャン・マイルストーン・ゲームオーバー ---------------- */
+function coinUI(){
+  animCount($('#sCoin'),state.coin);
+  const st=$('#sCoin').closest('.stat');
+  if(st) st.classList.toggle('low', state.coin<COST*3);
+}
+function addCoin(n){
+  state.coin=Math.max(0,state.coin+n);
+  coinUI();
+  if(n>0){
+    const el=$('#sCoin'); el.style.transform='scale(1.45)';
+    setTimeout(()=>{el.style.transition='transform .28s';el.style.transform='scale(1)';},70);
+    setTimeout(()=>el.style.transition='',360);
+  }
+}
+function rankOf(m){ let r=RANKS[0]; for(const x of RANKS) if(m>=x.n) r=x; return r; }
+function setRank(r){ $('#rankIcon').textContent=r.icon; $('#rankName').textContent=r.name; }
+function comboUI(){
+  const el=$('#combo');
+  if(state.combo>=3){ el.textContent=state.combo+' れんチャン！'; el.classList.add('on'); }
+  else el.classList.remove('on');
+}
+function milestone(kind,val){
+  const label = kind==='made'
+    ? 'ちんすこう '+val.toLocaleString()+'こ たっせい！'
+    : 'ヤバさ '+val.toLocaleString()+' たっせい！';
+  banner(label);
+  flash(kind==='made'?'rb':'gold');
+  confetti(kind==='made'?160:120, kind==='made'?'rainbow':'gold');
+  audio.milestone(kind==='made');
+  navigator.vibrate && navigator.vibrate([50,40,50,40,150]);
+  msg('<span class="'+(kind==='made'?'hl':'hlr')+'">'+label+'</span>','');
+}
+function rankUp(r){
+  banner('ランクアップ！ '+r.icon+' '+r.name);
+  flash('rb'); confetti(150,'rainbow'); audio.fanfare(0);
+  msg('<span class="hl">ランクアップ！</span> '+r.icon+' '+r.name+' になったよ','');
+}
+/* 1回転の結果をまとめて処理（連チャン・マイルストーン・ランク・保存・ゲームオーバー） */
+function postSpin(){
+  state.combo = lastWin ? state.combo+1 : 0;      // 当たりが続いた回数
+  comboUI();
+  if(lastWin && (state.combo===5 || state.combo===10)){
+    flash('gold'); confetti(200,'gold'); audio.siren(1);
+    banner(state.combo+'れんチャン！！！ とまらない！');
+  }
+  const ms=MADE_STEPS.filter(x=>prevMade<x && state.made>=x);
+  const rs=RISK_STEPS.filter(x=>prevRisk<x && state.risk>=x);
+  if(rs.length) milestone('risk', rs[rs.length-1]);
+  if(ms.length) milestone('made', ms[ms.length-1]);
+  const r=rankOf(state.made);
+  if(r.name!==curRank){ curRank=r.name; setRank(r); if(state.made>0) rankUp(r); }
+  save.made=state.made; save.risk=state.risk;     // つくった数・ヤバさは保存（ゲームオーバーでも消えない）
+  save.bestCombo=Math.max(save.bestCombo,state.combo);
+  save.bestCoin=Math.max(save.bestCoin,state.coin);
+  saveNow();
+  if(state.coin<COST) setTimeout(showGameOver,1500);   // 演出を見せてから
+}
+function showGameOver(){
+  if(overShown) return;
+  overShown=true;
+  save.plays++; saveNow();
+  $('#ovRec').innerHTML=
+    'つくった <span class="k">'+state.made.toLocaleString()+'</span> こ（ぜんぶで）<br>'+
+    'ヤバさ <span class="k">'+state.risk.toLocaleString()+'</span>（ぜんぶで）<br>'+
+    'れんチャン ベスト <span class="k">'+save.bestCombo+'</span><br>'+
+    'あそんだ回数 <span class="k">'+save.plays+'</span> 回';
+  $('#over').classList.add('on');
+  audio.gameover();
+  navigator.vibrate && navigator.vibrate([200,120,200,120,400]);
+}
+function restart(){
+  overShown=false;
+  $('#over').classList.remove('on');
+  state.coin=START_COIN; state.combo=0;           // コインだけ復活（つくった数・ヤバさ・ランクはのこる）
+  coinUI(); comboUI(); clearBig();
+  msg('<span class="hl">もういっかい！</span> つくった数は のこるよ','');
+  audio.small();
 }
 
 /* ---------------- 大文字（SVG / レインボー縁・金縁） ---------------- */
@@ -772,7 +920,12 @@ const audio={
     const n=big?8:4;
     for(let i=0;i<n;i++){ this.tone(900,0.16,'sawtooth',0.06,i*0.19,380); this.tone(380,0.16,'sawtooth',0.05,i*0.19+0.16,900); }
     if(big) for(let i=0;i<6;i++) this.tone(120,0.4,'square',0.05,i*0.3);
-  }
+  },
+  milestone(big){
+    [660,880,1320,1760].forEach((f,i)=>this.tone(f,0.22,'square',0.07,i*0.09));
+    if(big) this.tone(2093,0.5,'triangle',0.06,0.42);
+  },
+  gameover(){ [392,330,262,196].forEach((f,i)=>this.tone(f,0.36,'triangle',0.07,i*0.22)); }
 };
 function RBf(i){ return 440*Math.pow(2,i/12); }
 function drumroll(on){
@@ -834,6 +987,14 @@ addEventListener('mousemove',onMove);
 addEventListener('mouseup',onUp);
 $('#lever').addEventListener('click',()=>{ audio.ctx(); if(spinning) reels.find(r=>r.spinning)&&stopReel(reels.find(r=>r.spinning)); else startSpin(-1); });
 $('#mute').addEventListener('click',()=>{ audio.on=!audio.on; $('#mute').textContent=audio.on?'🔊':'🔇'; if(!audio.on) drumroll(false); });
+
+/* ---------------- v1.2 初期化 ---------------- */
+curRank=rankOf(state.made).name; setRank(rankOf(state.made));
+animCount($('#sMade'),state.made); animCount($('#sRisk'),state.risk);   // 保存した「ぜんぶで」を表示
+coinUI(); comboUI();
+$('#lever .sub').textContent='コイン -'+COST+' ／ フリックでもOK';
+$('#over .ov3').innerHTML='コイン '+START_COIN+' で もういっかい！<br>つくった数は のこるよ';
+$('#again').addEventListener('click',()=>{ audio.ctx(); restart(); });
 
 /* ---------------- メインループ（simT = シミュレーション時刻） ---------------- */
 let simT=0, last=performance.now()/1000, manual=false;
@@ -916,10 +1077,25 @@ window.__slot={
             rows:[0,1,2].map(r=>rowChars(r)),
             center:rowChars(1),
             want:outcome?outcome.word+'@'+outcome.row:null,
-            made:state.made, risk:state.risk, coin:state.coin,
+            made:state.made, risk:state.risk, coin:state.coin, combo:state.combo,
+            save:Object.assign({},save), rank:$('#rankName').textContent,
+            over:$('#over').classList.contains('on'),
+            overRec:$('#ovRec').textContent,
+            comboText:$('#combo').textContent, comboOn:$('#combo').classList.contains('on'),
+            leverSub:$('#lever .sub').textContent,
             msg:$('#msg').textContent, big:bigsvg.getAttribute('class'), bigtext:$('#bigG').textContent,
             reach:$('#reach').className, line:$('#line').className};
-  }
+  },
+  /* 検証用：コイン等を直接いじる（コインを尽きさせないためにも使う） */
+  set(o){
+    Object.assign(state,o);
+    animCount($('#sMade'),state.made); animCount($('#sRisk'),state.risk);
+    coinUI(); comboUI();
+    const r=rankOf(state.made); curRank=r.name; setRank(r);
+    return this.state();
+  },
+  over(){ showGameOver(); return this.state(); },
+  restart(){ restart(); return this.state(); }
 };
 if(qs.get('t')){                       // 例: index.html?t=word:<語>
   FORCE_MODE=buildOrder(qs.get('t'));
