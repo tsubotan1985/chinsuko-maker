@@ -183,6 +183,7 @@ body{
 #rankBadge{display:block;width:max-content;margin:-.2rem auto 0;font-size:1.45rem;font-weight:900;letter-spacing:0;
   padding:.3rem 1rem;border-radius:2rem;background:rgba(0,0,0,.5);border:.14rem solid rgba(255,255,255,.4);
   color:#ffe87a;text-shadow:0 0 .6rem rgba(255,215,0,.7)}
+#rankBadge svg{width:1.5em;height:1.5em;vertical-align:-.45em}
 #combo{font-size:2.2rem;font-weight:900;color:#fff;display:none;letter-spacing:.06em;
   -webkit-text-stroke:.22rem #7a0030;paint-order:stroke fill;text-shadow:0 0 1.1rem #ff2ea6}
 #combo.on{display:block;animation:reachZoom .3s ease-out infinite alternate}
@@ -211,7 +212,8 @@ body{
 #splash.out{animation:splashOut .55s ease-in forwards;pointer-events:none}
 @keyframes splashOut{to{opacity:0;transform:scale(1.14)}}
 .sp-box{text-align:center;padding:0 1.6rem;width:100%}
-.sp-cookie{font-size:7.2rem;line-height:1;filter:drop-shadow(0 0 1.8rem #ffd700);
+.sp-cs{display:block;width:7.6rem;height:7.6rem;margin:0 auto;
+  filter:drop-shadow(0 0 1.8rem rgba(255,214,64,.95)) drop-shadow(0 .5rem 1rem rgba(0,0,0,.5));
   animation:cookiePop .9s cubic-bezier(.2,1.8,.4,1) both, cookieSpin 3.6s ease-in-out .9s infinite}
 @keyframes cookiePop{from{opacity:0;transform:scale(.2) rotate(-40deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes cookieSpin{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.08)}}
@@ -233,6 +235,30 @@ body{
 </style>
 </head>
 <body>
+<!-- ちんすこうのアイコン（絵文字のクッキーではなく、ちゃんと「ちんすこう」を描いた絵） -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="csIcon" viewBox="0 0 120 120">
+    <defs>
+      <linearGradient id="csTop" x1=".2" y1="0" x2=".7" y2="1">
+        <stop offset="0" stop-color="#fff8de"/><stop offset=".45" stop-color="#f3dda4"/><stop offset="1" stop-color="#dcba6e"/>
+      </linearGradient>
+      <linearGradient id="csSide" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#d2a869"/><stop offset="1" stop-color="#8b6127"/>
+      </linearGradient>
+    </defs>
+    <g transform="rotate(-11 60 62)">
+      <rect x="15" y="52" width="90" height="40" rx="19" fill="url(#csSide)" stroke="#5d3d12" stroke-width="3.6"/>
+      <rect x="15" y="32" width="90" height="40" rx="19" fill="url(#csTop)" stroke="#5d3d12" stroke-width="3.6"/>
+      <g fill="#d9ba79">
+        <circle cx="34" cy="47" r="3.2"/><circle cx="55" cy="43" r="2.8"/><circle cx="75" cy="48" r="3.4"/>
+        <circle cx="45" cy="59" r="3"/><circle cx="66" cy="58" r="2.8"/><circle cx="86" cy="57" r="3"/>
+        <circle cx="24" cy="57" r="2.6"/>
+      </g>
+      <path d="M40 40 q8 8 4 16" stroke="#c9a761" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".9"/>
+      <path d="M27 39 q20 -9 40 -3" stroke="#fffdf0" stroke-width="5.5" fill="none" stroke-linecap="round" opacity=".8"/>
+    </g>
+  </symbol>
+</svg>
 <div id="app">
   <header id="topbar">
     <div class="logo">ちんすこうメーカー</div>
@@ -283,11 +309,11 @@ body{
 
   <div id="splash">
     <div class="sp-box">
-      <div class="sp-cookie">🍪</div>
+      <svg class="sp-cs" viewBox="0 0 120 120" aria-label="ちんすこう"><use href="#csIcon"/></svg>
       <div class="sp-titleWrap"><div class="sp-title">ちんすこうメーカー</div></div>
       <div class="sp-sub">ち・ん・す・こ・う を そろえろ！</div>
       <div class="sp-tap">タップで スタート</div>
-      <div class="sp-ver">v1.3</div>
+      <div class="sp-ver">v1.4</div>
     </div>
   </div>
 </div>
@@ -361,12 +387,12 @@ const RISKY_W=WORDS.filter(x=>x.kind==='risky');
 /* ---------------- v1.2: コイン経済・ランク・マイルストーン（低学年向けのやさしい設定） ----------------
    コイン＝「あと何回まわせるか」の資源。0になるとゲームオーバーだが、
    つくった数／ヤバさ／ランク／たっせい は保存されて消えない（やさしい）。 */
-const COST=5;                                  // 1回転でへるコイン
+const COST=6;                                  // 1回転でへるコイン
 const START_COIN=200;                          // はじめ／ゲームオーバー後にもらえるコイン
-const PAY={chinsuko:10, five:5, four:2, three:1, near:0};    // 当たりでもらえるコイン
+const PAY={chinsuko:20, five:10, four:4, three:2, near:0};   // 当たりでもらえるコイン（v1.4で増額）
 const RANKS=[                                  // つくった数（ぜんぶで）でランクアップ
   {n:0,      icon:'🥚', name:'みならい'},
-  {n:3000,   icon:'🍪', name:'せんぱい'},
+  {n:3000,   icon:'CS', name:'せんぱい'},
   {n:10000,  icon:'🏅', name:'しょくにん'},
   {n:30000,  icon:'🎖️', name:'めいじん'},
   {n:100000, icon:'👑', name:'たつじん'},
@@ -742,7 +768,13 @@ function addCoin(n){
   }
 }
 function rankOf(m){ let r=RANKS[0]; for(const x of RANKS) if(m>=x.n) r=x; return r; }
-function setRank(r){ $('#rankIcon').textContent=r.icon; $('#rankName').textContent=r.name; }
+function setRank(r){
+  const ic=$('#rankIcon');
+  // 'CS' は ちんすこうアイコン（絵文字のクッキーは使わない）
+  if(r.icon==='CS') ic.innerHTML='<svg viewBox="0 0 120 120"><use href="#csIcon"/></svg>';
+  else ic.textContent=r.icon;
+  $('#rankName').textContent=r.name;
+}
 function comboUI(){
   const el=$('#combo');
   if(state.combo>=3){ el.textContent=state.combo+' れんチャン！'; el.classList.add('on'); }
