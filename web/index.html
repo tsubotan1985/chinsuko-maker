@@ -264,14 +264,23 @@ const CHAR_BG={                                 // 見分けやすいよう淡�
   'こ':'linear-gradient(180deg,#e9fbe7,#bfe9bb)',
   'う':'linear-gradient(180deg,#f1ebff,#d6c8ff)',
 };
-const WORDS=[                // 5文字で作れる言葉だけが成立する（wt = 抽選の重み）
+const WORDS=[                // 5文字（ち・ん・す・こ・う）で作れる言葉だけが成立する（wt = 抽選の重み）
   // ※ この配列はアプリの動作に必要なデータなのでそのまま。文章（README/リリースノート）側は伏せている
   {w:'ちんすこう', kind:'happy', wt:0},      // ← 本線（レインボー）
-  {w:'ちんちんこ', kind:'risky', wt:1.0},    // 5文字＝超ヤバい
+  // --- 5文字：超ヤバい（マシマシ系。偶然揃う率はほぼ無視できるので演出を増やすのに最適）---
+  {w:'ちんちんこ', kind:'risky', wt:0.6},
+  {w:'ちんうんこ', kind:'risky', wt:0.6},
+  {w:'うんちんこ', kind:'risky', wt:0.6},
+  {w:'ちんうんち', kind:'risky', wt:0.6},
+  {w:'うんこちん', kind:'risky', wt:0.6},
+  {w:'ちんこちん', kind:'risky', wt:0.6},
+  // --- 4文字 ---
   {w:'ちんちん',   kind:'risky', wt:1.0},
-  {w:'ちんこ',     kind:'risky', wt:1.0},
-  {w:'うんこ',     kind:'risky', wt:1.6},    // 3文字：出やすさの調整（偏り防止）
+  {w:'うんちん',   kind:'risky', wt:1.0},
+  // --- 3文字（偶然でもよく揃うので、出しすぎないよう重みで調整）---
+  {w:'うんこ',     kind:'risky', wt:1.6},
   {w:'うんち',     kind:'risky', wt:1.6},
+  {w:'ちんこ',     kind:'risky', wt:1.0},
 ];
 const WORDS_S=[...WORDS].sort((a,b)=>b.w.length-a.w.length);
 const RISKY_W=WORDS.filter(x=>x.kind==='risky');

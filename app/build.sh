@@ -9,6 +9,12 @@ PLATFORM="$SDK/platforms/android-35/android.jar"
 JDK="$(ls -d "$HOME"/android-tools/jdk-17* | head -1)"
 OUT="$APP/build"
 
+# バージョンは AndroidManifest.xml を唯一の出典にする（build.sh 側で二重管理しない）
+VERSION="$(grep -oE 'android:versionName="[^"]+"' "$APP/AndroidManifest.xml" | head -1 | sed -E 's/.*="([^"]+)"/\1/')"
+VCODE="$(grep -oE 'android:versionCode="[^"]+"' "$APP/AndroidManifest.xml" | head -1 | sed -E 's/.*="([^"]+)"/\1/')"
+APKNAME="ChinsukoMaker-${VERSION}.apk"
+echo "version: ${VERSION} (code ${VCODE}) -> ${APKNAME}"
+
 export JAVA_HOME="$JDK"
 export PATH="$JDK/bin:$PATH"
 
@@ -30,8 +36,8 @@ echo "[2/6] aapt2 link"
   --java "$OUT/gen" \
   --min-sdk-version 26 \
   --target-sdk-version 34 \
-  --version-code 1 \
-  --version-name 1.0 \
+  --version-code "$VCODE" \
+  --version-name "$VERSION" \
   --auto-add-overlay
 
 echo "[3/6] javac"
@@ -65,8 +71,8 @@ if [ ! -f "$KS" ]; then
 fi
 "$BT/apksigner" sign --ks "$KS" --ks-pass pass:android --key-pass pass:android \
   --v1-signing-enabled true --v2-signing-enabled true \
-  --out "$OUT/ChinsukoMaker-1.0.apk" "$OUT/aligned.apk"
-"$BT/apksigner" verify --print-certs "$OUT/ChinsukoMaker-1.0.apk" | head -3
+  --out "$OUT/$APKNAME" "$OUT/aligned.apk"
+"$BT/apksigner" verify --print-certs "$OUT/$APKNAME" | head -3
 echo
-ls -la "$OUT/ChinsukoMaker-1.0.apk"
-"$BT/aapt2" dump badging "$OUT/ChinsukoMaker-1.0.apk" | head -6
+ls -la "$OUT/$APKNAME"
+"$BT/aapt2" dump badging "$OUT/$APKNAME" | head -6
