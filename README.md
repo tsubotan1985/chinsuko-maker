@@ -13,6 +13,12 @@
 - 中身は **HTML5 一枚もの**（`web/index.html`）を WebView で包んだだけ。依存ライブラリなし・APK 約 81KB
 - パッケージ: `com.tsubota.chinsuko` / minSdk 26 / targetSdk 34
 
+## ブラウザで遊ぶ（GitHub Pages）
+
+**https://tsubotan1985.github.io/chinsuko-maker/** を開くと、そのままブラウザで遊べます（スマホOK・タップと上下フリック）。
+APKのダウンロードも同じページから。ページの元ファイルは `docs/index.html`（案内）と `docs/play/index.html`（ゲーム本体、
+`web/index.html` をビルド時にコピー）です。
+
 ## インストール（Android）
 
 1. [Releases](https://github.com/tsubotan1985/chinsuko-maker/releases) から `ChinsukoMaker-1.4.apk`（最新）をダウンロード

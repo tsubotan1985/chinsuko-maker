@@ -26,6 +26,10 @@ mkdir -p "$OUT/classes" "$OUT/gen" "$OUT/dex" "$APP/assets"
 echo "[0/6] assets (HTML5本体を同梱)"
 cp -f "$APP/../web/index.html" "$APP/assets/index.html"
 
+echo "[0b/6] GitHub Pages 用（ブラウザでそのまま遊べる版）"
+mkdir -p "$APP/../docs/play"
+cp -f "$APP/../web/index.html" "$APP/../docs/play/index.html"
+
 echo "[1/6] aapt2 compile"
 "$BT/aapt2" compile --dir "$APP/res" -o "$OUT/res.zip"
 

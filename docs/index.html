@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ちんすこうメーカー｜ち・ん・す・こ・う を そろえろ！</title>
+<meta name="description" content="5つのリールが「ち・ん・す・こ・う」の5文字だけで回る、こども向けのスロットゲーム。ブラウザでそのまま遊べます。Androidアプリ（APK）もあります。">
+<meta name="theme-color" content="#150626">
+<style>
+  :root{--gold:#ffd400;--pink:#ff2ea6;--cyan:#00e5ff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"UD デジタル 教科書体 NK","UD Digi Kyokasho NK-B","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+    color:#fff;background:radial-gradient(circle at 50% 0%,#3a0d5c 0%,#1d0630 45%,#0b0114 100%);min-height:100vh;
+    -webkit-text-size-adjust:100%}
+  main{max-width:52rem;margin:0 auto;padding:2.4rem 1.4rem 4rem}
+  .hero{text-align:center}
+  .cs{width:9.6rem;height:9.6rem;display:block;margin:0 auto .4rem;
+    filter:drop-shadow(0 0 1.6rem rgba(255,214,64,.9)) drop-shadow(0 .6rem 1rem rgba(0,0,0,.5))}
+  h1{font-size:clamp(2.6rem,8.6vw,4.6rem);line-height:1.15;margin:.4rem 0 .2rem;font-weight:900;
+    background:linear-gradient(90deg,#ff004d,#ff8a00,#ffe600,#25ff64,#00e5ff,#4d5bff,#c400ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-stroke:.2rem #fff;paint-order:stroke fill;
+    filter:drop-shadow(0 0 .6rem #fff) drop-shadow(0 0 1.6rem #ff2ea6) drop-shadow(0 0 3rem #00e5ff)}
+  .sub{font-size:clamp(1.5rem,4.4vw,2rem);font-weight:900;color:#ffe87a;margin:.2rem 0 1.6rem;
+    text-shadow:0 0 1rem #ff8a00}
+  .btns{display:flex;flex-direction:column;gap:.9rem;max-width:34rem;margin:0 auto}
+  .btn{display:block;text-decoration:none;font-weight:900;font-size:1.85rem;text-align:center;padding:1.4rem 1rem;
+    border-radius:1.2rem;color:#2a0016;background:linear-gradient(180deg,#ffe680,#ffc107 45%,#ff7a00);
+    box-shadow:0 .5rem 0 #7a3b00,0 .9rem 1.4rem rgba(0,0,0,.55),inset 0 .26rem 0 rgba(255,255,255,.6)}
+  .btn:active{transform:translateY(.35rem);box-shadow:0 .12rem 0 #7a3b00}
+  .btn.ghost{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 .18rem rgba(255,255,255,.35)}
+  .note{font-size:1.3rem;line-height:1.7;opacity:.85;margin:1.4rem auto 0;max-width:38rem;text-align:left}
+  h2{font-size:1.9rem;font-weight:900;margin:3.4rem 0 1rem;padding-left:.8rem;border-left:.5rem solid var(--gold)}
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;margin-top:1.4rem}
+  .shots img{width:100%;height:auto;border-radius:1rem;border:.2rem solid rgba(255,255,255,.25);
+    box-shadow:0 .6rem 1.6rem rgba(0,0,0,.5)}
+  ul{font-size:1.45rem;line-height:1.85;padding-left:1.4rem;margin:.6rem 0}
+  li b{color:#ffe87a}
+  footer{margin-top:3.4rem;font-size:1.25rem;line-height:1.8;opacity:.75;text-align:center}
+  a{color:#7ef0ff}
+</style>
+</head>
+<body>
+<!-- ちんすこうの絵（アプリと同じ） -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="csIcon" viewBox="0 0 120 120">
+    <defs>
+      <linearGradient id="csTop" x1=".2" y1="0" x2=".7" y2="1">
+        <stop offset="0" stop-color="#fff8de"/><stop offset=".45" stop-color="#f3dda4"/><stop offset="1" stop-color="#dcba6e"/>
+      </linearGradient>
+      <linearGradient id="csSide" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#d2a869"/><stop offset="1" stop-color="#8b6127"/>
+      </linearGradient>
+    </defs>
+    <g transform="rotate(-11 60 62)">
+      <rect x="15" y="52" width="90" height="40" rx="19" fill="url(#csSide)" stroke="#5d3d12" stroke-width="3.6"/>
+      <rect x="15" y="32" width="90" height="40" rx="19" fill="url(#csTop)" stroke="#5d3d12" stroke-width="3.6"/>
+      <g fill="#d9ba79">
+        <circle cx="34" cy="47" r="3.2"/><circle cx="55" cy="43" r="2.8"/><circle cx="75" cy="48" r="3.4"/>
+        <circle cx="45" cy="59" r="3"/><circle cx="66" cy="58" r="2.8"/><circle cx="86" cy="57" r="3"/>
+        <circle cx="24" cy="57" r="2.6"/>
+      </g>
+      <path d="M40 40 q8 8 4 16" stroke="#c9a761" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".9"/>
+      <path d="M27 39 q20 -9 40 -3" stroke="#fffdf0" stroke-width="5.5" fill="none" stroke-linecap="round" opacity=".8"/>
+    </g>
+  </symbol>
+</svg>
+
+<main>
+  <div class="hero">
+    <svg class="cs" viewBox="0 0 120 120" aria-label="ちんすこう"><use href="#csIcon"/></svg>
+    <h1>ちんすこうメーカー</h1>
+    <p class="sub">ち・ん・す・こ・う を そろえろ！</p>
+    <div class="btns">
+      <a class="btn" href="./play/">▶ ブラウザで あそぶ</a>
+      <a class="btn ghost" href="https://github.com/tsubotan1985/chinsuko-maker/releases/latest">⬇ Androidアプリ（APK）</a>
+      <a class="btn ghost" href="https://github.com/tsubotan1985/chinsuko-maker">ソースコードを見る</a>
+    </div>
+    <p class="note">
+      5つのリールは <b>「ち・ん・す・こ・う」の5文字だけ</b>。5文字が並んで「ちんすこう」になるとレインボーの大当たり、
+      危うい言葉が揃うと金縁の大文字で「ヤバい！！」。
+      スマホは「ブラウザで あそぶ」でそのまま遊べます（タップ／上下フリック）。
+      APKは端末に入れて遊ぶ版で、インストール時に「提供元不明のアプリ」の許可が必要です（Android 8.0以上）。
+      APKは <a href="https://github.com/tsubotan1985/chinsuko-maker/releases">リリース一覧</a> から最新版をどうぞ。
+    </p>
+  </div>
+
+  <h2>スクリーンショット</h2>
+  <div class="shots">
+    <img src="screenshot-idle.png" alt="タイトル画面">
+    <img src="screenshot-spin.png" alt="回転中">
+    <img src="screenshot-chinsuko.png" alt="ちんすこう大当たり">
+    <img src="screenshot-yabai.png" alt="ヤバい当たり（文字はモザイク）">
+  </div>
+
+  <h2>あそびかた</h2>
+  <ul>
+    <li>リールを<b>上下にフリック</b>で回転（回転中のタップで左から順に停止＝目押し）。下の「ま わ せ」ボタンでも回せます</li>
+    <li><b>ちんすこう</b>が揃うとレインボーの大当たり（+1000 ／ コイン +20）</li>
+    <li>危うい言葉が揃うと金縁の大文字で「ヤバい！！」（5文字は「ちょうヤバい!!!!!」の超演出）</li>
+    <li><b>コイン</b>は「あと何回まわせるか」の資源（1回転 -6）。0になるとゲームオーバーですが、
+      <b>「もういっかい あそぶ」1タップで復帰</b>でき、<b>つくった数・ヤバさ・ランク・たっせいは消えません</b></li>
+    <li>つくった数とヤバさには<b>マイルストーン演出</b>、つくった数で<b>ランク</b>（みならい→せんぱい→…→でんせつ）が上がります</li>
+    <li>当たりが続くと<b>れんチャン</b>表示。5連・10連で追加演出</li>
+  </ul>
+
+  <h2>つくり</h2>
+  <ul>
+    <li>中身は<b>HTML5 一枚もの</b>（<code>web/index.html</code>）を WebView で包んだだけのAndroidアプリ。依存ライブラリなし・APK 約85KB</li>
+    <li>ビルドは Gradle なし（<code>aapt2 → javac → d8 → zipalign → apksigner</code>／<code>app/build.sh</code>）</li>
+    <li>対応: Android 8.0（API 26）以上 ／ パッケージ <code>com.tsubota.chinsuko</code></li>
+    <li>ライセンス: MIT（<a href="https://github.com/tsubotan1985/chinsuko-maker/blob/main/LICENSE">LICENSE</a>）</li>
+  </ul>
+
+  <footer>
+    <p>ちんすこうメーカー ／ <a href="https://github.com/tsubotan1985/chinsuko-maker">GitHub リポジトリ</a> ／
+      <a href="https://github.com/tsubotan1985/chinsuko-maker/releases">リリース一覧</a></p>
+    <p>※ リールに出るのは「ち・ん・す・こ・う」の5文字だけです。当たりの「あの言葉」は下ネタ系のため、このページでは伏せています。</p>
+  </footer>
+</main>
+</body>
+</html>
